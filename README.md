@@ -1,139 +1,146 @@
 # Simulador de Conta Bancária
 
-Aplicação web de **simulação bancária**, criada como projeto de portfólio para demonstrar a integração entre HTML5, CSS3, JavaScript puro, Node.js e PostgreSQL.
+Aplicação com cadastro, autenticação, crédito inicial baseado em dados da RAIS, saques e extrato. Desenvolvida com HTML5, CSS3, JavaScript puro, Node.js e PostgreSQL.
 
-> **Atenção:** este projeto é exclusivamente educacional. Não representa uma instituição financeira, não movimenta dinheiro real e não calcula salários individuais reais.
+**[Acessar o projeto](https://projeto-simulador-caixa.onrender.com)** · **[Código-fonte](https://github.com/helderneiva/projeto-simulador-caixa)**
 
 ## Funcionalidades
 
-- Cadastro de usuários com validação no navegador e no servidor.
-- Autenticação, sessão temporária e encerramento de sessão.
-- Crédito inicial virtual baseado na referência nacional de remuneração da profissão selecionada.
-- Saques virtuais com validação do saldo e composição das cédulas disponibilizadas.
-- Registro das movimentações, consulta do extrato e comprovante imprimível.
-- Layout responsivo, navegação por teclado e mensagens de status acessíveis.
+- Cadastro com validação no navegador e no servidor, idade mínima de 18 anos e verificação da coerência entre idade e tempo de emprego.
+- Login, sessão temporária e encerramento da sessão.
+- Crédito inicial definido a partir da profissão, UF, escolaridade e tempo no emprego, conforme a disponibilidade dos recortes.
+- Quatro denominações diferentes por conta, sorteadas entre R$ 2, R$ 5, R$ 10, R$ 20, R$ 50, R$ 100 e R$ 200.
+- Saques em reais inteiros, com validação do saldo e composição com a menor quantidade possível de cédulas disponíveis.
+- Extrato paginado, consulta das movimentações e impressão de comprovantes.
+- Persistência de contas, saldos e movimentações no PostgreSQL.
+- Interface responsiva com fontes e imagens locais.
 
 ## Tecnologias
 
-- **Interface:** HTML5, CSS3 e JavaScript (sem framework de front-end).
-- **Servidor:** Node.js 24+ com módulo nativo `node:http`.
-- **Banco:** PostgreSQL (compatível com Neon) e pacote `pg`.
-- **Publicação sugerida:** Render Web Service.
+- HTML5, CSS3 e JavaScript sem frameworks.
+- Node.js 24 ou superior, com servidor HTTP nativo.
+- PostgreSQL e pacote `pg`.
+- Neon para o banco e Render para a aplicação publicada.
 
-## Estrutura principal
+## Estrutura
 
-```text
-simulador-conta-bancaria/
-├── banco/                  # Conexão, SQL e criação das tabelas (arquivos do projeto original)
-├── logica/
-│   ├── aplicacao.mjs       # Rotas, sessão e arquivos estáticos
-│   ├── contas.mjs          # Saques, extratos e sessão
-│   ├── credito.mjs         # Crédito inicial transacional
-│   ├── limite-tentativas.mjs
-│   ├── referencias.mjs     # Referências de profissões
-│   ├── saques.mjs          # Distribuição de notas (projeto original)
-│   ├── senhas.mjs          # Senhas (projeto original)
-│   └── validacao.mjs       # Validação (projeto original)
-├── public/
-│   ├── imagens/
-│   │   ├── favicon.png
-│   │   └── notas/
-│   ├── estilos/
-│   ├── scripts/
-│   ├── favicon.ico
-│   ├── caixa.html
-│   ├── extrato.html
-│   ├── index.html
-│   └── login.html
-├── testes/
-│   └── limite-tentativas.test.mjs
-├── .env.example
-├── .gitignore
-├── package.json
-├── package-lock.json
-├── render.yaml
-└── servidor.mjs
-```
+- `banco/`: conexão, scripts SQL e preparação das tabelas.
+- `dados/`: consulta SQL, exportação da RAIS, importador e catálogo de referências por perfil.
+- `logica/`: rotas, autenticação, validações, crédito, contas e composição dos saques.
+- `public/`: páginas, estilos, scripts, fontes e imagens.
+- `servidor.mjs`: configuração e inicialização do servidor.
 
 ## Executar localmente
 
-1. Instale o Node.js **24 ou superior** e tenha acesso a um banco PostgreSQL.
-2. Instale as dependências com `npm ci`.
-3. Copie `.env.example` para `.env` e informe a URL do banco em `DATABASE_URL`.
-4. **Com o banco de testes e após revisar o script `banco/criar.mjs` do seu projeto original**, execute `npm run banco:criar` caso as tabelas ainda precisem ser preparadas. Antes de rodar em um banco que já contém contas ou movimentações, faça backup e confirme que o script não apaga nem reinicializa dados.
-5. Execute `npm test` para os testes do limitador e `npm start` para iniciar a aplicação.
-6. Acesse `http://localhost:3000`.
+Instale o Node.js 24 ou superior e tenha uma conexão PostgreSQL disponível.
 
-O servidor verifica se as tabelas necessárias já existem e se há créditos iniciais pendentes; não executa migrações automaticamente ao iniciar.
+```bash
+git clone https://github.com/helderneiva/projeto-simulador-caixa.git
+cd projeto-simulador-caixa
+npm ci
+```
 
-### Variáveis de ambiente
+Crie o arquivo `.env` na raiz do projeto:
 
-| Nome | Finalidade |
+```dotenv
+DATABASE_URL=postgresql://USUARIO:SENHA@HOST/BANCO?sslmode=require
+NODE_ENV=development
+APP_ORIGIN=http://localhost:3000
+PORT=3000
+```
+
+Substitua `DATABASE_URL` pela string de conexão do seu banco. O arquivo `.env` deve permanecer fora do versionamento.
+
+Prepare as tabelas e inicie o servidor:
+
+```bash
+npm run banco:criar
+npm start
+```
+
+Acesse [http://localhost:3000](http://localhost:3000). Para reiniciar automaticamente o servidor durante o desenvolvimento, use `npm run dev`.
+
+A preparação do banco aplica os scripts da pasta `banco/` e os créditos iniciais pendentes. Contas que já receberam o crédito inicial são preservadas. O servidor verifica a estrutura ao iniciar; não executa essa preparação automaticamente.
+
+## Crédito inicial e referências
+
+O catálogo `dados/referencias-perfil.json` reúne 5.588 recortes gerados pela consulta da RAIS 2025, abrangendo as 14 categorias profissionais do cadastro.
+
+A consulta seleciona vínculos ativos em 31 de dezembro, com remuneração média positiva, e calcula a média em centavos. Os recortes usam profissão, UF, escolaridade e tempo no emprego. Cada grupo precisa conter pelo menos 30 vínculos para ser utilizado.
+
+O sistema procura uma referência nesta ordem:
+
+1. Profissão, UF, escolaridade e tempo no emprego.
+2. Profissão, escolaridade e tempo no emprego, em âmbito nacional.
+3. Profissão, UF e escolaridade.
+4. Profissão, UF e tempo no emprego.
+5. Profissão e escolaridade, em âmbito nacional.
+6. Profissão e tempo no emprego, em âmbito nacional.
+7. Profissão e UF.
+8. Profissão, em âmbito nacional.
+
+O valor corresponde a uma única média do grupo selecionado. Idade, sexo e modalidade de trabalho não são multiplicadores do crédito. A idade participa das validações do cadastro. O tempo informado corresponde ao tempo no emprego atual.
+
+Os filtros utilizados e a quantidade de vínculos são registrados com a movimentação inicial. Atualizar o catálogo não recalcula créditos de contas já cadastradas.
+
+### Atualizar o catálogo
+
+Gere a consulta SQL:
+
+```bash
+node dados/preparar-perfil.mjs consulta
+```
+
+Execute `dados/consulta-perfil.sql` no BigQuery e exporte o resultado completo como JSON para `dados/exportacao-rais.json`. Importe o arquivo:
+
+```bash
+node dados/preparar-perfil.mjs importar dados/exportacao-rais.json
+```
+
+Reinicie o servidor para carregar o catálogo atualizado. O importador não executa consultas no BigQuery nem altera o banco de contas.
+
+### Fontes
+
+- Microdados: `basedosdados.br_me_rais.microdados_vinculos`, consultados no BigQuery.
+- [Base dos Dados](https://basedosdados.org/).
+- [Tabulação secundária utilizada nas referências de apoio](https://github.com/PedroBartkevihi/painel-rais-2025).
+- Consulta e critérios de agregação disponíveis em `dados/consulta-perfil.sql`.
+
+## Publicação
+
+O serviço publicado utiliza estas configurações no Render:
+
+| Campo | Valor |
 | --- | --- |
-| `DATABASE_URL` | Conexão PostgreSQL; deve ficar em segredo. |
-| `PORT` | Porta HTTP; localmente, `3000`. No Render, é configurada pela plataforma. |
-| `NODE_ENV` | Use `production` no servidor publicado. |
-| `APP_ORIGIN` | Origem pública exata do site, sem `/` final obrigatório, como `https://seu-site.onrender.com`. |
-| `RENDER_EXTERNAL_URL` | Origem padrão disponibilizada automaticamente pelo Render, utilizada se `APP_ORIGIN` não for definida. |
+| Tipo | Web Service |
+| Linguagem | Node |
+| Branch | `main` |
+| Root Directory | Em branco |
+| Build Command | `npm ci` |
+| Start Command | `npm start` |
+| `NODE_ENV` | `production` |
+| `APP_ORIGIN` | `https://projeto-simulador-caixa.onrender.com` |
+| `DATABASE_URL` | String de conexão do PostgreSQL configurada no painel |
+| `EMBED_ORIGINS` | Origem HTTPS do laboratório autorizado a incorporar o simulador |
 
-A variável `APP_ORIGIN` é opcional no Render quando o usuário acessa o endereço padrão `onrender.com`, mas é necessária caso se utilize um domínio próprio diferente.
+Em produção, `APP_ORIGIN` deve corresponder à origem HTTPS usada para acessar a aplicação. A porta é recebida pela variável `PORT` da plataforma.
 
-## Publicar com Neon e Render
+## Abertura no Laboratório JavaScript
 
-1. No **Neon**, crie um projeto PostgreSQL. Copie a string de conexão apropriada para o servidor. Prefira conexão TLS com verificação do certificado, sem desabilitar a checagem (`rejectUnauthorized: false`).
-2. Prepare o esquema do banco usando os scripts SQL do projeto original. **Não execute scripts de criação ou reinicialização sem verificar seu efeito sobre dados existentes.**
-3. Envie o repositório ao GitHub. Antes, confirme com `git status` que **`.env` não está versionado**.
-4. No **Render**, crie um *Blueprint* a partir do arquivo `render.yaml` ou um serviço **Web Service** usando Node.js.
-5. Forneça `DATABASE_URL` em **Environment**, no painel do Render, e não no repositório. O Blueprint solicita esse valor porque usa `sync: false`.
-6. Configure `npm ci` como comando de construção e `npm start` como comando de inicialização. Configure `/health` como caminho de verificação de saúde.
-7. Acesse o endereço HTTPS informado pelo Render e teste cadastro, login, saldo, saque, extrato e saída.
+O card do laboratório aponta para o endereço público no Render e utiliza a janela interna já existente no laboratório.
 
-O projeto usa um cookie de sessão `HttpOnly` e `SameSite=Lax`; com `NODE_ENV=production`, o cookie também recebe `Secure`.
+Configure `EMBED_ORIGINS` no Render com a origem HTTPS exata do laboratório, sem caminho. Para o endereço padrão do GitHub Pages deste usuário, use `https://helderneiva.github.io`. Se o laboratório utilizar outro domínio, informe a origem correspondente. É possível autorizar mais de uma origem separando-as por vírgula.
 
-### Limite de tentativas
+Sem essa variável, a incorporação permanece bloqueada. A variável controla quem pode incorporar as páginas; os POSTs continuam aceitando somente a origem do próprio simulador, definida em `APP_ORIGIN`.
 
-- Cadastro: **8** tentativas por IP a cada dez minutos.
-- Login: **15** tentativas por IP a cada dez minutos.
-- Saque: **60** tentativas por IP a cada dez minutos.
-- Encerramento da sessão: não usa o mesmo limitador de tentativas.
+Com a incorporação habilitada em produção, o cookie é particionado. A sessão na janela interna pode ser independente da sessão aberta diretamente no Render. Restrições do navegador ao armazenamento incorporado ainda podem afetar o login; o botão existente “Abrir em nova aba” permanece disponível.
 
-No Render, o aplicativo considera o endereço IP encaminhado pela infraestrutura da plataforma, preferindo `CF-Connecting-IP`. Fora do Render, usa o endereço do socket. **Esses contadores são armazenados na memória de um processo**: não são compartilhados entre instâncias nem persistem após reiniciar. Em escala maior, substitua por um armazenamento centralizado, como Redis, e considere proteção adicional por usuário no login.
+## Autenticação e integridade das operações
 
-## Metodologia do crédito inicial
-
-O crédito virtual corresponde à referência **nacional por profissão** presente em `logica/referencias.mjs`, identificada no projeto como RAIS 2025, com tabulação secundária. O campo `valorCentavos` é gravado numa movimentação do tipo `credito_inicial` e utilizado como saldo inicial. O crédito não é um pagamento de salário real.
-
-**Nesta versão, o cálculo considera somente a profissão.** Dados de idade, tempo de emprego, estado, sexo, escolaridade e modalidade de trabalho ficam registrados no perfil, mas não modificam a referência nacional. As 14 categorias do cadastro incluem profissões agregadas por mais de um código CBO; algumas podem compartilhar o mesmo valor por utilizarem o mesmo código de referência.
-
-A relação completa dos valores e códigos CBO está em `logica/referencias.mjs`. É importante conferir a procedência e a metodologia de cada agregação caso os valores sejam apresentados como estatísticas oficiais; esta versão registra as referências informadas no projeto, não fornece verificação independente de todos os cálculos.
-
-**Fontes informadas pelo projeto:**
-
-- [RAIS 2025 – Ministério do Trabalho e Emprego](https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho/rais/rais-2025/rais-2025)
-- [Tabulação secundária referenciada no código](https://github.com/PedroBartkevihi/painel-rais-2025)
-
-Uma versão futura poderá usar recortes reais da RAIS por ocupação, UF, escolaridade e outras características, sempre com transparência sobre amostras, comparabilidade e limitações. **Não se deve inventar coeficientes de ajuste e apresentá-los como conclusões da RAIS.**
-
-## Segurança e limitações
-
-- Senhas e dados pessoais são tratados no servidor; não inclua credenciais ou dados pessoais verdadeiros em capturas de tela do portfólio.
-- Operações de saque são transacionais e usam identificadores para evitar duplicação acidental.
-- Há validação de `Origin` nos POSTs, cabeçalhos básicos de segurança e uma lista explícita de recursos estáticos permitidos.
-- Não configure o servidor diretamente exposto a uma rede pública fora do Render sem reavaliar o modelo de confiança dos cabeçalhos de proxy.
-- Este repositório não deve conter arquivos `.env`, senhas, chaves ou dados de usuários.
-- O código foi preparado para publicação, mas a validação end-to-end depende dos arquivos restantes do projeto e de um banco PostgreSQL configurado.
-
-## Checklist de apresentação
-
-- [ ] Repositório sem segredos nem arquivos pessoais.
-- [ ] Banco preparado sem perda de contas existentes.
-- [ ] Serviço no Render com `DATABASE_URL` configurada.
-- [ ] `GET /health` retornando `200`.
-- [ ] Cadastro, login e saída testados.
-- [ ] Crédito inicial, saque e extrato conferidos em ambiente de testes.
-- [ ] Favicon e imagem da marca renderizados corretamente.
-- [ ] Link público adicionado ao Laboratório JavaScript.
-
-## Créditos visuais
-
-A interface utiliza uma identidade visual própria. As imagens de cédulas, quando presentes no projeto original, são identificadas na página como materiais do Banco Central do Brasil disponibilizados via Wikimedia Commons. Verifique as condições de uso e atribuição de cada arquivo antes da publicação pública.
+- Senhas protegidas com `scrypt` e salt individual.
+- Tokens de sessão armazenados como hash no banco.
+- Cookies `HttpOnly` e `SameSite=Lax`, com `Secure` em produção. Quando a incorporação é habilitada em produção, a sessão utiliza `SameSite=None; Secure; Partitioned`.
+- Validação da origem das requisições POST e lista de arquivos estáticos permitidos.
+- Operações monetárias em centavos inteiros, usando `BIGINT` e `BigInt`.
+- Saques com transação, bloqueio da conta durante a operação e identificador para evitar duplicação de uma mesma solicitação.
+- Limitação de tentativas em memória por endereço do socket e rota. Os contadores pertencem ao processo e são reiniciados com o servidor.

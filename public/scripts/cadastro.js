@@ -57,6 +57,70 @@ function formatarCelular() {
     }
 }
 
+function formatarNascimento(evento) {
+    const valorAnterior = campoNascimento.value;
+    const cursorAnterior = campoNascimento.selectionStart ?? valorAnterior.length;
+    const formatoISO = /^(\d{4})-(\d{2})-(\d{2})$/.exec(valorAnterior);
+    const valor = formatoISO
+        ? `${formatoISO[3]}${formatoISO[2]}${formatoISO[1]}`
+        : valorAnterior;
+    const numeros = valor.replace(/[^0-9]/g, '').slice(0, 8);
+    const digitosAntes = formatoISO
+        ? numeros.length
+        : valorAnterior.slice(0, cursorAnterior).replace(/[^0-9]/g, '').length;
+
+    let formatado = numeros.slice(0, 2);
+
+    if (numeros.length > 2) {
+        formatado += '/' + numeros.slice(2, 4);
+    }
+
+    if (numeros.length > 4) {
+        formatado += '/' + numeros.slice(4, 8);
+    }
+
+    campoNascimento.value = formatado;
+
+    if (document.activeElement === campoNascimento) {
+        let posicao = 0;
+        let encontrados = 0;
+
+        while (posicao < formatado.length && encontrados < digitosAntes) {
+            if (/[0-9]/.test(formatado[posicao])) {
+                encontrados++;
+            }
+
+            posicao++;
+        }
+
+        if (formatado[posicao] === '/' && !evento?.inputType?.startsWith('delete')) {
+            posicao++;
+        }
+
+        campoNascimento.setSelectionRange(posicao, posicao);
+    }
+}
+
+function obterNascimentoISO() {
+    const partes = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(campoNascimento.value);
+
+    if (!partes) {
+        return null;
+    }
+
+    const dia = Number(partes[1]);
+    const mes = Number(partes[2]);
+    const ano = Number(partes[3]);
+    const bissexto = ano % 4 === 0 && (ano % 100 !== 0 || ano % 400 === 0);
+    const diasPorMes = [31, bissexto ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+    if (ano < 1 || mes < 1 || mes > 12 || dia < 1 || dia > diasPorMes[mes - 1]) {
+        return null;
+    }
+
+    return `${partes[3]}-${partes[2]}-${partes[1]}`;
+}
+
 function validarIdadeETempo() {
     campoNascimento.setCustomValidity('');
     campoTempo.setCustomValidity('');
@@ -77,24 +141,28 @@ function validarIdadeETempo() {
     const anoAtual = Number(partes.year);
     const mesAtual = Number(partes.month);
     const diaAtual = Number(partes.day);
-    const anoLimite = anoAtual - 18;
-    const ultimoDia = new Date(anoLimite, mesAtual, 0).getDate();
-    const diaLimite = Math.min(diaAtual, ultimoDia);
-
-    campoNascimento.max = [anoLimite, String(mesAtual).padStart(2, '0'), String(diaLimite).padStart(2, '0')].join('-');
 
     if (!campoNascimento.value) {
         return;
     }
 
-    const [ano, mes, dia] = campoNascimento.value.split('-').map(Number);
+    const nascimento = obterNascimentoISO();
+
+    if (!nascimento) {
+        campoNascimento.setCustomValidity('Informe uma data válida no formato DD/MM/AAAA.');
+        return;
+    }
+
+    const [ano, mes, dia] = nascimento.split('-').map(Number);
     let idade = anoAtual - ano;
 
     if (mesAtual < mes || (mesAtual === mes && diaAtual < dia)) {
         idade--;
     }
 
-    if (idade < 18) {
+    if (idade < 0) {
+        campoNascimento.setCustomValidity('A data de nascimento não pode estar no futuro.');
+    } else if (idade < 18) {
         campoNascimento.setCustomValidity('É necessário ter pelo menos 18 anos completos.');
     }
 
@@ -137,6 +205,10 @@ function atualizarValidacao(evento) {
         formatarCelular();
     }
 
+    if (campo === campoNascimento) {
+        formatarNascimento(evento);
+    }
+
     if (campo === campoNascimento || campo === campoTempo) {
         validarIdadeETempo();
     }
@@ -164,6 +236,30 @@ function apresentarErros(erros) {
     formulario.reportValidity();
 }
 
+campoNascimento.addEventListener('beforeinput', (evento) => {
+    const inicio = campoNascimento.selectionStart;
+    const fim = campoNascimento.selectionEnd;
+
+    if (inicio === null || inicio !== fim || !evento.cancelable) {
+        return;
+    }
+
+    if (evento.inputType === 'deleteContentBackward' && campoNascimento.value[inicio - 1] === '/') {
+        evento.preventDefault();
+        campoNascimento.setRangeText('', Math.max(0, inicio - 2), inicio, 'start');
+    } else if (evento.inputType === 'deleteContentForward' && campoNascimento.value[inicio] === '/') {
+        evento.preventDefault();
+        campoNascimento.setRangeText('', inicio, inicio + 2, 'start');
+    } else {
+        return;
+    }
+
+    campoNascimento.dispatchEvent(new InputEvent('input', {
+        bubbles: true,
+        inputType: evento.inputType
+    }));
+});
+
 formulario.addEventListener('input', atualizarValidacao);
 formulario.addEventListener('change', atualizarValidacao);
 
@@ -175,6 +271,7 @@ formulario.addEventListener('submit', async (evento) => {
     }
 
     formatarCelular();
+    formatarNascimento();
     validarIdadeETempo();
 
     for (const campo of [campoNome, campoSobrenome, campoUsuario]) {
@@ -194,6 +291,7 @@ formulario.addEventListener('submit', async (evento) => {
 
     try {
         const dados = new URLSearchParams(new FormData(formulario));
+        dados.set('nascimento', obterNascimentoISO());
 
         const resposta = await fetch(formulario.action, {
             method: 'POST',
@@ -225,4 +323,5 @@ formulario.addEventListener('submit', async (evento) => {
 });
 
 formatarCelular();
+formatarNascimento();
 validarIdadeETempo();

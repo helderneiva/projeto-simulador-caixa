@@ -104,6 +104,37 @@ function lerFormulario(requisicao) {
 }
 
 export function criarServidor(pool, { origem, producao = false }) {
+    const origensIncorporacao = [...new Set(
+        (process.env.EMBED_ORIGINS ?? '')
+            .split(',')
+            .map(valor => valor.trim())
+            .filter(Boolean)
+            .map(valor => {
+                const url = new URL(valor);
+
+                if (
+                    !['http:', 'https:'].includes(url.protocol) ||
+                    (producao && url.protocol !== 'https:') ||
+                    url.username || url.password ||
+                    url.pathname !== '/' || url.search || url.hash
+                ) {
+                    throw new Error('EMBED_ORIGINS deve conter origens válidas, separadas por vírgula, com HTTPS em produção.');
+                }
+
+                return url.origin;
+            })
+    )];
+
+    const permitirIncorporacao = origensIncorporacao.length > 0;
+
+    const politicaQuadros = permitirIncorporacao
+        ? "'self' " + origensIncorporacao.join(' ')
+        : "'none'";
+
+    const atributosCookie = producao && permitirIncorporacao
+        ? 'SameSite=None; Secure; Partitioned'
+        : `SameSite=Lax${producao ? '; Secure' : ''}`;
+
     const tentativas = new Map();
 
     const servidor = createServer(async function (requisicao, resposta) {
@@ -113,7 +144,11 @@ export function criarServidor(pool, { origem, producao = false }) {
         };
 
         const cookie = (token, segundos) => {
-            resposta.setHeader('Set-Cookie', `sessao=${token}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${segundos}${producao ? '; Secure' : ''}`);
+            const valor = `sessao=${token}; HttpOnly; Path=/; Max-Age=${segundos}; ${atributosCookie}`;
+
+            resposta.setHeader('Set-Cookie', producao && permitirIncorporacao
+                ? ['sessao=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax; Secure', valor]
+                : valor);
         };
 
         resposta.setHeader('Cache-Control', 'no-store');
@@ -121,7 +156,7 @@ export function criarServidor(pool, { origem, producao = false }) {
         resposta.setHeader('Referrer-Policy', 'same-origin');
         resposta.setHeader(
             'Content-Security-Policy',
-            "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"
+            `default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors ${politicaQuadros}`
         );
 
         try {
@@ -148,6 +183,7 @@ export function criarServidor(pool, { origem, producao = false }) {
                     const agora = Date.now();
                     const anterior = tentativas.get(chave);
                     const registro = anterior && anterior.ate > agora ? anterior : { quantidade: 0, ate: agora + 600000 };
+
                     registro.quantidade++;
                     tentativas.set(chave, registro);
 
@@ -175,6 +211,7 @@ export function criarServidor(pool, { origem, producao = false }) {
                 if (caminho === '/saque') {
                     const token = tokenDaRequisicao(requisicao);
                     const resultado = await realizarSaque(pool, token ? resumoToken(token) : null, entrada);
+
                     json(resultado.repetido ? 200 : 201, resultado);
                     return;
                 }

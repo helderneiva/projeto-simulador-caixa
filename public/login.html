@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrar | Simulador de Conta Bancária</title>
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="stylesheet" href="/estilos/base.css">
+    <link rel="stylesheet" href="/estilos/acesso.css">
+    <script src="/scripts/cartao.js" defer></script>
+    <script src="/scripts/login.js" defer></script>
+</head>
+<body class="pagina-acesso login">
+    <a class="pular-conteudo" href="#conteudo-principal">Ir para o conteúdo principal</a>
+
+    <header class="cabecalho-acesso">
+        <a class="marca" href="/">
+            <img src="/imagens/favicon.png" alt="" width="40" height="40">
+            <span>
+                Simulador
+                <span class="marca-detalhe">Conta bancária</span>
+            </span>
+        </a>
+
+        <a href="/">Criar conta</a>
+    </header>
+
+    <main id="conteudo-principal" class="acesso-layout">
+        <div class="abertura-acesso">
+            <p class="etiqueta">Que bom ter você por aqui &#x1F604;</p>
+            <h1>Sua conta.<br>Seu <em>próximo passo.</em></h1>
+
+            <div class="experiencia-cartao">
+                <button class="cartao-bancario" type="button" aria-label="Virar cartão de demonstração" aria-pressed="false" aria-describedby="orientacao-cartao descricao-cartao">
+                    <span class="cartao-rotacao" aria-hidden="true">
+                        <span class="cartao-face cartao-frente">
+                            <span class="cartao-topo"><span class="cartao-marca">HN card<span>Conta bancária</span></span><span class="cartao-selo">Virtual</span></span>
+                            <span class="cartao-chip"></span>
+                            <span class="cartao-titulo">Uma conta de possibilidades.</span>
+                            <span class="cartao-base"><span><small>Titular</small><strong data-cartao-nome>Sua próxima experiência</strong></span><span class="cartao-seta">↗</span></span>
+                        </span>
+
+                        <span class="cartao-face cartao-verso">
+                            <span class="cartao-topo"><span class="cartao-marca">Seu próximo capítulo.</span><span class="cartao-selo">Gold</span></span>
+                            <span class="cartao-profissao" data-cartao-profissao>Continue de onde parou</span>
+                            <span class="cartao-texto">Entre na sua conta para consultar seu saldo, realizar saques e acompanhar suas movimentações.</span>
+                            <span class="cartao-rodape">Uma experiência de JavaScript. Valores fictícios.</span>
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+
+        <section class="cartao-login" aria-labelledby="titulo-login">
+            <p class="etiqueta">Acesso ao simulador</p>
+            <h2 id="titulo-login">Vamos continuar?</h2>
+
+            <form id="formulario-login" action="/login" method="post" aria-busy="true">
+                <div class="campo">
+                    <label for="usu">Usuário</label>
+                    <input type="text" name="usu" id="usu" minlength="6" maxlength="18" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+                </div>
+
+                <div class="campo">
+                    <label for="sen">Senha</label>
+                    <input type="password" name="sen" id="sen" minlength="8" maxlength="128" autocomplete="current-password" required>
+                </div>
+
+                <button type="submit" disabled>Entrar na conta <span aria-hidden="true">↗</span></button>
+            </form>
+
+            <p id="mensagem-login" role="status" aria-atomic="true">Verificando sessão…</p>
+            <p class="rodape-cartao">Primeiro acesso? <a href="/">Crie sua conta</a></p>
+        </section>
+    </main>
+
+    <footer class="rodape-acesso">
+        <p>Um experimento de JavaScript.</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caixa Eletrônico | Simulador de Conta Bancária</title>
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="stylesheet" href="/estilos/base.css">
+    <link rel="stylesheet" href="/estilos/caixa.css">
+    <script type="module" src="/scripts/principal.js"></script>
+</head>
+<body class="pagina-caixa">
+    <a class="pular-conteudo" href="#conteudo-principal">Ir para o conteúdo principal</a>
+
+    <header class="cabecalho-pagina">
+        <a class="marca" href="/caixa.html">
+            <img src="/imagens/favicon-caixa.png" alt="" width="40" height="40">
+            <span>
+                Conta bancária
+                <span class="marca-detalhe">simulador</span>
+            </span>
+        </a>
+
+        <span class="selo-simulacao">Ativa</span>
+    </header>
+
+    <main id="conteudo-principal" aria-busy="true">
+        <div class="titulo-terminal">
+            <div>
+                <p class="etiqueta">Terminal pessoal / acesso autorizado</p>
+                <h1>Você no <em>controle.</em></h1>
+            </div>
+
+            <p class="numero-terminal">SIMULAÇÃO / TERMINAL 01</p>
+        </div>
+
+        <p id="mensagem-caixa" role="status" aria-atomic="true">Carregando sua conta…</p>
+
+        <div id="painel-conta" hidden>
+            <section class="saldo" aria-labelledby="titulo-saldo">
+                <h2 id="titulo-saldo">Saldo disponível</h2>
+                <p class="valor-saldo"><strong id="saldo-disponivel"></strong></p>
+                <div class="resumo-titular"><div><strong id="titular-resumo"></strong><small id="profissao-resumo"></small></div><span>CONTA <span id="numero-conta"></span></span></div>
+            </section>
+
+            <section class="notas" aria-labelledby="titulo-notas">
+                <h2 id="titulo-notas">Notas disponíveis neste caixa</h2>
+                <ul id="notas-disponiveis" class="lista-notas"></ul>
+                <p>Quantidade ilimitada dessas cédulas, respeitando seu saldo.</p>
+                <p class="credito-imagens">Cédulas do real: Banco Central do Brasil. Arquivos: Wikimedia Commons.</p>
+            </section>
+
+            <section class="operacao" aria-labelledby="titulo-saque">
+                <p class="etiqueta">01 / Escolha o valor</p>
+                <h2 id="titulo-saque">Quanto deseja<br>retirar hoje?</h2>
+
+                <form id="formulario-saque" action="/saque" method="post">
+                    <div class="campo">
+                        <label for="valor-saque">Valor em reais</label>
+                        <input type="number" id="valor-saque" name="valor" min="1" step="1" inputmode="numeric" aria-describedby="orientacao-saque" required>
+                        <p id="orientacao-saque">Informe somente reais inteiros, sem centavos.</p>
+                    </div>
+
+                    <div id="atalhos-saque" role="group" aria-label="Sugestões de valores disponíveis"></div>
+                    <button type="submit">Confirmar saque <span aria-hidden="true">↗</span></button>
+                </form>
+
+                <p id="mensagem-saque" role="status" aria-atomic="true"></p>
+            </section>
+
+            <details class="identificacao">
+                <summary>Ver identificação completa</summary>
+                <dl id="perfil-conta" class="dados-conta"></dl>
+            </details>
+
+            <nav class="acoes-conta" aria-label="Ações da conta">
+                <a href="/extrato.html">Consultar meu extrato <span aria-hidden="true">↗</span></a>
+                <button id="sair" type="button">Sair da conta</button>
+            </nav>
+        </div>
+
+        <button id="tentar-novamente" type="button" hidden>Tentar novamente</button>
+    </main>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar | Simulador de Conta Bancária</title>
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="stylesheet" href="/estilos/base.css">
+    <link rel="stylesheet" href="/estilos/acesso.css">
+    <script src="/scripts/cartao.js" defer></script>
+    <script src="/scripts/cadastro.js" defer></script>
+</head>
+<body class="pagina-acesso cadastro">
+    <a class="pular-conteudo" href="#conteudo-principal">Ir para o conteúdo principal</a>
+
+    <header class="cabecalho-acesso">
+        <a class="marca" href="/">
+            <img src="/imagens/favicon.png" alt="" width="40" height="40">
+            <span>
+                Conta bancária
+                <span class="marca-detalhe">simulador</span>
+            </span>
+        </a>
+
+        <a href="/login.html">Já tenho conta</a>
+    </header>
+
+    <main id="conteudo-principal" class="acesso-layout">
+        <aside class="abertura-acesso" aria-labelledby="titulo-cadastro">
+            
+            <h1 id="titulo-cadastro">Uma conta.<br>Mil <em>possibilidades.</em></h1>
+            <p class="texto-abertura">Crie seu perfil, descubra seu saldo e experimente o caixa eletrônico do futuro.</p>
+
+            <div class="experiencia-cartao">
+                <button class="cartao-bancario" type="button" aria-label="Virar cartão de demonstração" aria-pressed="false" aria-describedby="orientacao-cartao descricao-cartao">
+                    <span class="cartao-rotacao" aria-hidden="true">
+                        <span class="cartao-face cartao-frente">
+                            <span class="cartao-topo"><span class="cartao-marca">HN card<span>Conta bancária</span></span><span class="cartao-selo">Virtual</span></span>
+                            <span class="cartao-chip"></span>
+                            <span class="cartao-titulo">Uma conta de possibilidades.</span>
+                            <span class="cartao-base"><span><small>Titular</small><strong data-cartao-nome>Seu nome aqui</strong></span><span class="cartao-seta">↗</span></span>
+                        </span>
+
+                        <span class="cartao-face cartao-verso">
+                            <span class="cartao-topo"><span class="cartao-marca">Seu próximo capítulo.</span><span class="cartao-selo">Gold</span></span>
+                            <span class="cartao-profissao" data-cartao-profissao>Sua trajetória começa aqui</span>
+                            <span class="cartao-texto">Cadastre-se, conheça seu crédito inicial e experimente as operações do caixa.</span>
+                            <span class="cartao-rodape">Uma experiência pura na programação JavaScript.</span>
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </aside>
+
+        <form id="formulario-cadastro" action="/cadastro" method="post" autocomplete="off">
+            <fieldset>
+                <legend>Seus dados</legend>
+
+                <div class="campo">
+                    <label for="nome">Nome:</label>
+                    <input type="text" name="nome" id="nome" placeholder="Digite seu nome" maxlength="30" autocomplete="given-name" required>
+                </div>
+
+                <div class="campo">
+                    <label for="sobrenome">Sobrenome:</label>
+                    <input type="text" name="sobrenome" id="sobrenome" placeholder="Digite seu sobrenome" maxlength="60" autocomplete="family-name" required>
+                </div>
+
+                <div class="campo">
+                    <label for="nascimento">Data de Nascimento:</label>
+                    <input type="date" name="nascimento" id="nascimento" autocomplete="bday" required>
+                </div>
+
+                <div class="campo" role="group" aria-labelledby="rotulo-sexo">
+                    <p id="rotulo-sexo">Sexo:</p>
+
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" name="sexo" id="sexomas" value="M" required>
+                            <label for="sexomas">Masculino</label>
+                        </div>
+
+                        <div class="radio-item">
+                            <input type="radio" name="sexo" id="sexofem" value="F" required>
+                            <label for="sexofem">Feminino</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="campo">
+                    <label for="estado">Estado:</label>
+                    <select name="estado" id="estado" required>
+                        <option value="" selected disabled>Selecione seu Estado</option>
+
+                        <optgroup label="Região Norte">
+                            <option value="AC">Acre</option>
+                            <option value="AP">Amapá</option>
+                            <option value="AM">Amazonas</option>
+                            <option value="PA">Pará</option>
+                            <option value="RO">Rondônia</option>
+                            <option value="RR">Roraima</option>
+                            <option value="TO">Tocantins</option>
+                        </optgroup>
+
+                        <optgroup label="Região Nordeste">
+                            <option value="AL">Alagoas</option>
+                            <option value="BA">Bahia</option>
+                            <option value="CE">Ceará</option>
+                            <option value="MA">Maranhão</option>
+                            <option value="PB">Paraíba</option>
+                            <option value="PE">Pernambuco</option>
+                            <option value="PI">Piauí</option>
+                            <option value="RN">Rio Grande do Norte</option>
+                            <option value="SE">Sergipe</option>
+                        </optgroup>
+
+                        <optgroup label="Região Centro-Oeste">
+                            <option value="DF">Distrito Federal</option>
+                            <option value="GO">Goiás</option>
+                            <option value="MT">Mato Grosso</option>
+                            <option value="MS">Mato Grosso do Sul</option>
+                        </optgroup>
+
+                        <optgroup label="Região Sudeste">
+                            <option value="ES">Espírito Santo</option>
+                            <option value="MG">Minas Gerais</option>
+                            <option value="RJ">Rio de Janeiro</option>
+                            <option value="SP">São Paulo</option>
+                        </optgroup>
+
+                        <optgroup label="Região Sul">
+                            <option value="PR">Paraná</option>
+                            <option value="RS">Rio Grande do Sul</option>
+                            <option value="SC">Santa Catarina</option>
+                        </optgroup>
+                    </select>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Sua trajetória</legend>
+
+                <div class="campo">
+                    <label for="profissao">Profissão:</label>
+                    <select name="profissao" id="profissao" required>
+                        <option value="" selected disabled>Selecione sua profissão</option>
+                        <option value="professor">Professor</option>
+                        <option value="veterinario">Veterinário</option>
+                        <option value="advogado">Advogado</option>
+                        <option value="cabeleireiro">Cabeleireiro</option>
+                        <option value="cozinheiro">Cozinheiro</option>
+                        <option value="enfermeiro">Enfermeiro</option>
+                        <option value="designer-grafico">Designer gráfico</option>
+                        <option value="farmaceutico">Farmacêutico</option>
+                        <option value="programador">Programador</option>
+                        <option value="analista-sistemas">Analista de sistemas</option>
+                        <option value="desenvolvedor-software">Desenvolvedor de software</option>
+                        <option value="vendedor">Vendedor</option>
+                        <option value="caminhoneiro">Caminhoneiro</option>
+                        <option value="mecanico">Mecânico</option>
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="tempo-emprego">Tempo no Emprego Atual:</label>
+                    <select name="tempoEmprego" id="tempo-emprego" required>
+                        <option value="" selected disabled>Selecione o tempo</option>
+                        <option value="ate-1">Até 1 ano</option>
+                        <option value="mais-1-ate-5">Mais de 1 até 5 anos</option>
+                        <option value="mais-5-ate-10">Mais de 5 até 10 anos</option>
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="escolaridade">Escolaridade:</label>
+                    <select name="escolaridade" id="escolaridade" required>
+                        <option value="" selected disabled>Selecione a escolaridade</option>
+                        <option value="sem-instrucao">Sem instrução formal</option>
+                        <option value="fundamental-incompleto">Ensino fundamental incompleto</option>
+                        <option value="fundamental-completo">Ensino fundamental completo</option>
+                        <option value="medio-incompleto">Ensino médio incompleto</option>
+                        <option value="medio-completo">Ensino médio completo</option>
+                        <option value="superior-incompleto">Ensino superior incompleto</option>
+                        <option value="superior-completo">Ensino superior completo</option>
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="modalidade-trabalho">Modalidade de Trabalho:</label>
+                    <select name="modalidadeTrabalho" id="modalidade-trabalho" required>
+                        <option value="" selected disabled>Selecione a modalidade</option>
+                        <option value="presencial">Presencial</option>
+                        <option value="hibrido">Híbrido</option>
+                        <option value="remoto">Remoto</option>
+                    </select>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Seu acesso</legend>
+
+                <div class="campo">
+                    <label for="email">E-mail:</label>
+                    <input type="email" name="email" id="email" autocomplete="email" maxlength="254" placeholder="seu@email.com" required>
+                </div>
+
+                <div class="campo">
+                    <label for="tel">Celular:</label>
+                    <input type="tel" name="celular" id="tel" placeholder="(xx) xxxxx-xxxx" autocomplete="tel-national" inputmode="tel" pattern="\([0-9]{2}\) [0-9]{5}-[0-9]{4}" maxlength="15" title="Informe o DDD e o número no formato (33) 99999-9999." required>
+                </div>
+
+                <div class="campo">
+                    <label for="usu">Usuário:</label>
+                    <input type="text" name="usu" id="usu" minlength="6" maxlength="18" placeholder="Nome de usuário" autocomplete="username" autocapitalize="none" pattern="[A-Za-z0-9_.\-]{6,18}" title="Use de 6 a 18 letras sem acento, números, pontos, hífens ou sublinhados." spellcheck="false" required>
+                </div>
+
+                <div class="campo">
+                    <label for="sen">Senha:</label>
+                    <input type="password" name="sen" id="sen" minlength="8" maxlength="128" placeholder="Mínimo oito caracteres" autocomplete="new-password" required>
+                </div>
+            </fieldset>
+
+            <p id="mensagem-cadastro" role="status" aria-atomic="true"></p>
+            <button type="submit">Criar minha conta <span aria-hidden="true">↗</span></button>
+        </form>
+    </main>
+
+    <footer class="rodape-acesso"><p>Simulador de Conta Bancária</p><p>Valores fictícios.</p></footer>
+</body>
+</html>

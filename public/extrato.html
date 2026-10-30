@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extrato | Simulador de Conta Bancária</title>
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="stylesheet" href="/estilos/base.css">
+    <link rel="stylesheet" href="/estilos/extrato.css">
+    <script type="module" src="/scripts/extrato.js"></script>
+</head>
+<body class="pagina-extrato">
+    <a class="pular-conteudo" href="#conteudo-principal">Ir para o conteúdo principal</a>
+
+    <header class="cabecalho-pagina">
+        <a class="marca" href="/caixa.html">
+            <img src="/imagens/favicon.png" alt="" width="40" height="40">
+            <span>Conta bancária<span class="marca-detalhe">simulador</span></span>
+        </a>
+    </header>
+
+    <main id="conteudo-principal" aria-busy="true">
+        <div class="titulo-extrato">
+            <div>
+                <p class="etiqueta">Arquivo pessoal de movimentações</p>
+                <h1>Seu dinheiro.<br><em>Sua história.</em></h1>
+            </div>
+
+            <span class="carimbo-arquivo" aria-hidden="true">Arquivo / JS</span>
+        </div>
+
+        <p id="mensagem-extrato" role="status" aria-atomic="true">Carregando extrato…</p>
+        <button id="tentar-novamente" type="button" hidden>Tentar novamente</button>
+
+        <div id="painel-extrato" hidden>
+            <section class="saldo" aria-labelledby="titulo-saldo">
+                <h2 id="titulo-saldo">Saldo atual</h2>
+                <p class="valor-saldo"><strong id="saldo-atual"></strong></p>
+            </section>
+
+            <section id="comprovante" class="comprovante" aria-labelledby="titulo-comprovante" hidden>
+                <div class="cabecalho-comprovante">
+                    <strong>Simulador / comprovante</strong>
+                    <span aria-hidden="true">✓</span>
+                </div>
+
+                <h2 id="titulo-comprovante">Comprovante de saque simulado</h2>
+                <p id="resumo-saque"></p>
+                <dl id="dados-movimentacao" class="dados-conta"></dl>
+
+                <h3>Cédulas entregues</h3>
+                <ul id="notas-entregues" class="notas-entregues"></ul>
+
+                <details class="perfil-comprovante">
+                    <summary>Consultar perfil utilizado</summary>
+                    <dl id="perfil-comprovante" class="dados-conta"></dl>
+                </details>
+
+                <button id="imprimir" type="button">Imprimir comprovante</button>
+            </section>
+
+            <section class="historico" aria-labelledby="titulo-historico">
+                <h2 id="titulo-historico">Movimentações</h2>
+                <p id="historico-vazio" hidden>Nenhuma movimentação registrada.</p>
+
+                <div class="tabela-container" role="region" aria-labelledby="titulo-historico" tabindex="0">
+                    <table>
+                        <caption>Histórico da conta, do mais recente para o mais antigo</caption>
+
+                        <thead>
+                            <tr>
+                                <th scope="col">Data</th>
+                                <th scope="col">Operação</th>
+                                <th scope="col">Valor</th>
+                                <th scope="col">Saldo após</th>
+                                <th scope="col">Detalhes</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="movimentacoes"></tbody>
+                    </table>
+                </div>
+
+                <button id="carregar-anteriores" type="button" hidden>Carregar anteriores</button>
+            </section>
+        </div>
+
+        <nav class="acoes-conta" aria-label="Navegação da conta">
+            <a href="/caixa.html">Fazer outro saque <span aria-hidden="true">↗</span></a>
+        </nav>
+    </main>
+</body>
+</html>
